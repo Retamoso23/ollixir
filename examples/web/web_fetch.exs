@@ -1,0 +1,51 @@
+# Web Fetch Example (Cloud API)
+# Run with: elixir examples/web/web_fetch.exs
+
+root = Path.expand("../..", __DIR__)
+
+ollixir_dep =
+  if File.exists?(Path.join(root, "mix.exs")) do
+    {:ollixir, path: root}
+  else
+    {:ollixir, "~> 0.10.0"}
+  end
+
+if Code.ensure_loaded?(Mix.Project) &&
+     function_exported?(Mix.Project, :get, 0) &&
+     Process.whereis(Mix.ProjectStack) &&
+     Mix.Project.get() do
+  :ok
+else
+  Mix.install([ollixir_dep])
+end
+
+client = Ollixir.init()
+
+if System.get_env("OLLAMA_API_KEY") in [nil, ""] do
+  IO.puts("""
+  Skipping web fetch. Set OLLAMA_API_KEY to run this example.
+
+  1) Create an account at https://ollama.com
+  2) Generate a key at https://ollama.com/settings/keys
+  3) export OLLAMA_API_KEY="your_key_here"
+  """)
+
+  System.halt(0)
+end
+
+case Ollixir.web_fetch(client, url: "https://elixir-lang.org") do
+  {:ok, page} ->
+    IO.puts("Title: #{page.title}")
+    IO.puts("Content preview: #{String.slice(page.content || "", 0, 200)}...")
+
+  {:error, error} when is_struct(error, Ollixir.ResponseError) and error.status in [401, 403] ->
+    IO.puts("""
+    Web fetch failed: #{Exception.message(error)}
+
+    The API key appears to be invalid. Create a new key:
+    https://ollama.com/settings/keys
+    """)
+
+  {:error, error} ->
+    IO.puts("Web fetch failed: #{inspect(error)}")
+end

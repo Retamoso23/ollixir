@@ -1,0 +1,62 @@
+defmodule Ollixir.Errors do
+  @moduledoc """
+  Error handling utilities for Ollixir.
+
+  ## Error Types
+
+    * `Ollixir.ConnectionError` - Connection errors (server unreachable)
+    * `Ollixir.RequestError` - Pre-request validation errors
+    * `Ollixir.ResponseError` - API response errors
+  """
+
+  alias Ollixir.{ConnectionError, RequestError, ResponseError}
+
+  @doc """
+  Wrap a function result, converting errors to appropriate types.
+  """
+  @spec wrap(term()) ::
+          {:ok, term()} | {:error, ConnectionError.t() | RequestError.t() | ResponseError.t()}
+  def wrap({:ok, _} = success), do: success
+  def wrap({:error, %ConnectionError{}} = error), do: error
+  def wrap({:error, %RequestError{}} = error), do: error
+  def wrap({:error, %ResponseError{}} = error), do: error
+
+  def wrap({:error, %{status: _status} = response}),
+    do: {:error, ResponseError.from_response(response)}
+
+  def wrap({:error, reason}), do: {:error, RequestError.exception(inspect(reason))}
+
+  @doc """
+  Check if an error is retryable.
+  """
+  @spec retryable?(ConnectionError.t() | RequestError.t() | ResponseError.t()) :: boolean()
+  def retryable?(%ConnectionError{}), do: true
+  def retryable?(%ResponseError{} = e), do: ResponseError.retryable?(e)
+  def retryable?(%RequestError{}), do: false
+
+  @doc """
+  Get error message from any error type.
+  """
+  @spec error_message(ConnectionError.t() | RequestError.t() | ResponseError.t() | term()) ::
+          String.t()
+  def error_message(%ConnectionError{} = e), do: Exception.message(e)
+  def error_message(%RequestError{} = e), do: Exception.message(e)
+  def error_message(%ResponseError{} = e), do: Exception.message(e)
+  def error_message(other), do: inspect(other)
+
+  @doc """
+  Format error for logging.
+  """
+  @spec format_for_log(ConnectionError.t() | RequestError.t() | ResponseError.t()) :: String.t()
+  def format_for_log(%ConnectionError{} = e) do
+    "[Ollixir.ConnectionError] #{Exception.message(e)}"
+  end
+
+  def format_for_log(%RequestError{} = e) do
+    "[Ollixir.RequestError] #{Exception.message(e)}"
+  end
+
+  def format_for_log(%ResponseError{status: status} = e) do
+    "[Ollixir.ResponseError] HTTP #{status}: #{e.error || e.message}"
+  end
+end
